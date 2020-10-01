@@ -8,6 +8,8 @@ add_library(${PROJECT_NAME} STATIC
 target_link_libraries(${PROJECT_NAME}
             PUBLIC
                 Render
+            PRIVATE
+                glfw
 )
 
 target_include_directories(${PROJECT_NAME} 

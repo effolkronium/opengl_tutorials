@@ -4,3 +4,8 @@ Render::Render()
 {
 
 }
+
+Render::~Render()
+{
+
+}
