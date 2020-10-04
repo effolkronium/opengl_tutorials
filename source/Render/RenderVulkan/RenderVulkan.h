@@ -1,11 +1,11 @@
 #pragma once
 
-#include "Render.h"
+#include "IRender.h"
 
-class RenderVulkan : public Render
+class RenderVulkan : public IRender
 {
 public:
 	RenderVulkan();
 
-	void run() override;
+	void startRenderLoop() override;
 };

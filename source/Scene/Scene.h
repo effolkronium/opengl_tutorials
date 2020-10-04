@@ -1,11 +1,11 @@
-#include "IRenderCreator.h"
+#include "IRender.h"
 
 class Scene
 {
 public:
-	Scene(IRenderCreator& renderCreator);
+	Scene(IRender& render);
 
 	virtual void run() = 0;
 private:
-	IRenderCreator& m_renderCreator;
+	IRender& m_render;
 };

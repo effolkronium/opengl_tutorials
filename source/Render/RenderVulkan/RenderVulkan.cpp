@@ -6,7 +6,7 @@ RenderVulkan::RenderVulkan()
 
 }
 
-void RenderVulkan::run()
+void RenderVulkan::startRenderLoop()
 {
 	std::cout << "render vulkan" << std::endl;
 }
