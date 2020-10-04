@@ -1,5 +1,9 @@
 project(RenderOpengl LANGUAGES CXX)
 
+file(GLOB SHADERS Shaders/*)
+
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${SHADERS})
+
 add_library(${PROJECT_NAME} STATIC 
             Window.h
             Window.cpp
@@ -13,6 +17,8 @@ add_library(${PROJECT_NAME} STATIC
             Shaders.h
 
             ../IRender.h
+
+            ${SHADERS}
 
             ${CMAKE_SOURCE_DIR}/external/glad_opengl4.6_core/src/glad.c
 )
@@ -33,10 +39,11 @@ target_include_directories(${PROJECT_NAME}
                 ${CMAKE_CURRENT_SOURCE_DIR}
             PRIVATE
                 ${CMAKE_SOURCE_DIR}/external/glad_opengl4.6_core/include
+                ${CMAKE_SOURCE_DIR}/external/
 )
 
 
-# Shaders processing
+# Shaders processing for c++ include
 
 function(make_includable input_file output_path include_file)
     get_filename_component(input_file_name ${input_file} NAME)
@@ -55,8 +62,7 @@ endfunction(make_includable)
 file(REMOVE Shaders.h)
 file(REMOVE_RECURSE ShadersGen)
 
-file(GLOB SHADERS Shaders/*)
-
 foreach(shader ${SHADERS})
     make_includable(${shader} ShadersGen/ Shaders.h)
 endforeach()
+
