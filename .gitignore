@@ -34,3 +34,5 @@
 # Build dir
 build/
 .vs/
+.vscode/
+ShadersGen/

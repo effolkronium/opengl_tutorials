@@ -1,5 +1,6 @@
 add_subdirectory(Render)
 add_subdirectory(Scene)
+add_subdirectory(Utils)
 
 add_executable(${CMAKE_PROJECT_NAME} main.cpp)
 
