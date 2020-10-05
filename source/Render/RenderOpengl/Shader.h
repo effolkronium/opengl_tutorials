@@ -3,6 +3,7 @@
 #include <string>
 #include <filesystem>
 #include "glad/glad.h"
+#include "glm/glm.hpp"
 
 class Shader final
 {
@@ -14,6 +15,7 @@ public:
     void setBool(const std::string& name, bool value) const;
     void setInt(const std::string& name, int value) const;
     void setFloat(const std::string& name, float value) const;
+    void setMat4(const std::string& name, const glm::mat4& mat);
 private:
     GLuint compileShader(const char* source, GLenum shaderType);
     GLuint linkShader(GLuint vertex, GLuint fragment);

@@ -1,6 +1,7 @@
 #include "Shader.h"
 #include "glad/glad.h"
 #include <cassert>
+#include "glm/gtc/type_ptr.hpp"
 
 using namespace std::literals;
 
@@ -44,6 +45,11 @@ void Shader::setFloat(const std::string& name, float value) const
 {
 	assert(m_programID);
 	glUniform1f(glGetUniformLocation(m_programID, name.c_str()), value);
+}
+
+void Shader::setMat4(const std::string& name, const glm::mat4& mat)
+{
+	glUniformMatrix4fv(glGetUniformLocation(m_programID, name.c_str()), 1, GL_FALSE, glm::value_ptr(mat));
 }
 
 GLuint Shader::compileShader(const char* source, GLenum shaderType)
