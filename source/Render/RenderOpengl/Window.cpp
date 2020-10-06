@@ -59,6 +59,7 @@ Window::Window()
 	if (!glfwInit())
 		throw std::runtime_error{ "glfwInit has failed" };
 
+
 	glfwSetErrorCallback(errorCcallback);
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -71,6 +72,8 @@ Window::Window()
 
 	glfwMakeContextCurrent(m_window);
 
+	glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
 	// Unlimited fps
 	//glfwSwapInterval(0);
 
@@ -82,6 +85,16 @@ Window::Window()
 	glfwSetFramebufferSizeCallback(m_window, [](GLFWwindow* window, int x, int y) {
 		auto _this = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
 		_this->getResizeCallback()(window, x, y);
+	});
+
+	glfwSetCursorPosCallback(m_window, [](GLFWwindow* window, double x, double y) {
+		auto _this = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
+		_this->getMouseCallback()(window, x, y);
+	});
+
+	glfwSetScrollCallback(m_window, [](GLFWwindow* window, double x, double y) {
+		auto _this = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
+		_this->getMouseScrollCallback()(window, x, y);
 	});
 
 	glEnable(GL_DEBUG_OUTPUT);
@@ -103,7 +116,27 @@ void Window::setResizeCallback(resizeCallback_t resizeCallback)
 	m_resizeCallback = resizeCallback;
 }
 
+void Window::setMouseCallback(mouseCallback_t resizeCallback)
+{
+	m_mouseCallback = resizeCallback;
+}
+
+void Window::setMouseScrollCallback(mouseCallback_t resizeCallback)
+{
+	m_mouseScrollCallback = resizeCallback;
+}
+
 const Window::resizeCallback_t& Window::getResizeCallback()
 {
 	return m_resizeCallback;
+}
+
+const Window::mouseCallback_t& Window::getMouseCallback()
+{
+	return m_mouseCallback;
+}
+
+const Window::mouseCallback_t& Window::getMouseScrollCallback()
+{
+	return m_mouseScrollCallback;
 }

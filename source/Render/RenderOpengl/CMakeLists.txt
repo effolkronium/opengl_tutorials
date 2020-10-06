@@ -14,6 +14,9 @@ add_library(${PROJECT_NAME} STATIC
             Shader.cpp
             Shader.h
 
+            Camera.cpp
+            Camera.h
+
             Shaders.h
 
             ../IRender.h

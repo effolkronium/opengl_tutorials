@@ -6,6 +6,8 @@
 #include "glm/glm.hpp"
 #include "Shader.h"
 #include "Shaders.h"
+#include "Camera.h"
+
 #include <string>
 #include <iostream>
 
@@ -17,11 +19,42 @@
 class RenderOpengl::Impl
 {
 public:
+	float fov = 45.f;
+	Camera camera{ glm::vec3(0.0f, 0.0f, 3.0f) };
+
 	Impl()
 	{
 		m_window.setResizeCallback([this] (auto w, int x, int y) {
 			glViewport(0, 0, x, y);
 			render(); 
+		});
+
+		m_window.setMouseCallback([this](auto w, double xpos, double ypos) {
+			static float lastX = 400, lastY = 300;
+			static bool firstMouse = true;
+			if (firstMouse)
+			{
+				lastX = xpos;
+				lastY = ypos;
+				firstMouse = false;
+			}
+
+			std::cout << xpos << " : " << ypos << std::endl;
+
+			float xoffset = xpos - lastX;
+			float yoffset = lastY - ypos;
+			lastX = xpos;
+			lastY = ypos;
+
+			camera.ProcessMouseMovement(xoffset, yoffset);
+		});
+
+		m_window.setMouseScrollCallback([this](auto w, double xpos, double ypos) {
+			fov -= (float)ypos;
+			if (fov < 1.0f)
+				fov = 1.0f;
+			if (fov > 45.0f)
+				fov = 45.0f;
 		});
 	}
 
@@ -72,54 +105,60 @@ public:
 		}
 	}
 
-	void render()
+	void processInput()
+	{
+		static float deltaTime = 0.0f;	// Time between current frame and last frame
+		static float lastFrame = 0.0f; // Time of last frame
+
+		float currentFrame = glfwGetTime();
+		deltaTime = currentFrame - lastFrame;
+		lastFrame = currentFrame;
+
+		if (glfwGetKey(m_window.get(), GLFW_KEY_W) == GLFW_PRESS)
+			camera.ProcessKeyboard(Camera_Movement::FORWARD, deltaTime);
+		if (glfwGetKey(m_window.get(), GLFW_KEY_S) == GLFW_PRESS)
+			camera.ProcessKeyboard(Camera_Movement::BACKWARD, deltaTime);
+		if (glfwGetKey(m_window.get(), GLFW_KEY_A) == GLFW_PRESS)
+			camera.ProcessKeyboard(Camera_Movement::LEFT, deltaTime);
+		if (glfwGetKey(m_window.get(), GLFW_KEY_D) == GLFW_PRESS)
+			camera.ProcessKeyboard(Camera_Movement::RIGHT, deltaTime);
+	}
+
+	const glm::vec3 cubePositions[10] = {
+			glm::vec3(0.0f,  0.0f,  0.0f),
+			glm::vec3(2.0f,  5.0f, -15.0f),
+			glm::vec3(-1.5f, -2.2f, -2.5f),
+			glm::vec3(-3.8f, -2.0f, -12.3f),
+			glm::vec3(2.4f, -0.4f, -3.5f),
+			glm::vec3(-1.7f,  3.0f, -7.5f),
+			glm::vec3(1.3f, -2.0f, -2.5f),
+			glm::vec3(1.5f,  2.0f, -2.5f),
+			glm::vec3(1.5f,  0.2f, -1.5f),
+			glm::vec3(-1.3f,  1.0f, -1.5f)
+	};
+
+	void clear()
 	{
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	}
 
+	void render()
+	{
+		clear();
 		showFPS();
+		processInput();
 
-		glm::mat4 view = glm::mat4(1.0f);
-		// note that we're translating the scene in the reverse direction of where we want to move
-		view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
-
-		glm::mat4 projection;
-		projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.f);
-		
-
-		//triangleShader.setMat4("PVM", projection * view * model);
-	
-		// bind textures on corresponding texture units
-		static bool test = false;
-		if (!test)
-		{
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, texture);
-			glActiveTexture(GL_TEXTURE1);
-			glBindTexture(GL_TEXTURE_2D, texture2);
-			test = true;
-		}
+		glm::mat4 view = camera.GetViewMatrix();
+		glm::mat4 projection = glm::perspective(glm::radians(fov), 800.0f / 600.0f, 0.1f, 200.f);
 
 		triangleShader.use();
 		glBindVertexArray(VAO1);
 
-		static const glm::vec3 cubePositions[] = {
-			glm::vec3( 0.0f,  0.0f,  0.0f), 
-			glm::vec3( 2.0f,  5.0f, -15.0f), 
-			glm::vec3(-1.5f, -2.2f, -2.5f),  
-			glm::vec3(-3.8f, -2.0f, -12.3f),  
-			glm::vec3( 2.4f, -0.4f, -3.5f),  
-			glm::vec3(-1.7f,  3.0f, -7.5f),  
-			glm::vec3( 1.3f, -2.0f, -2.5f),  
-			glm::vec3( 1.5f,  2.0f, -2.5f), 
-			glm::vec3( 1.5f,  0.2f, -1.5f), 
-			glm::vec3(-1.3f,  1.0f, -1.5f)  
-		};
-
 		for (unsigned int i = 0; i < 10; i++)
 		{
-			glm::mat4 model = glm::mat4(1.0f);
-			model = glm::translate(model, cubePositions[i]);
+			glm::mat4 model = glm::translate(glm::mat4(1.0f), cubePositions[i]);
+
 			float angle = 20.0f * i;
 
 			model = glm::rotate(model, (float)glfwGetTime() * i, glm::vec3(1.0f, 0.3f, 0.5f));
@@ -240,6 +279,7 @@ public:
 
 
 		glGenTextures(1, &texture2);
+		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, texture2);
 		// set the texture wrapping/filtering options (on the currently bound texture object)
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
