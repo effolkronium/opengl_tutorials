@@ -150,12 +150,12 @@ public:
 		glm::mat4 view = camera.GetViewMatrix();
 		glm::mat4 projection = glm::perspective(glm::radians(fov), 800.0f / 600.0f, 0.1f, 200.f);
 
-		glm::vec3 lightPos(1.2f, 1.5f, -2.0f);
+		glm::vec3 lightPos(1.2f, 1.0f, -2.0f);
 		glm::vec3 objectPos(1.0f, 1.0f, -1.0f);
 
 		// change the light's position values over time (can be done anywhere in the render loop actually, but try to do it at least before using the light source positions)
-		lightPos.x = 1.0f + sin(glfwGetTime()) * 2.0f;
-		lightPos.y = sin(glfwGetTime() / 2.0f) * 1.0f;
+		/*lightPos.x = 1.0f + sin(glfwGetTime()) * 2.0f;
+		lightPos.y = sin(glfwGetTime() / 2.0f) * 1.0f;*/
 
 		glm::mat4 model = glm::translate(glm::mat4(1.0f), lightPos);
 		model = glm::scale(model, glm::vec3(0.2f));
@@ -177,7 +177,18 @@ public:
 		lightingShader.setMat4("model", model);
 		lightingShader.setVec3("viewPos", camera.Position);
 
-		lightingShader.setVec3("lightPos", lightPos);
+		lightingShader.setVec3("light.position", lightPos);
+
+		glm::vec3 lightColor;
+		lightColor.x = sin(glfwGetTime() * 2.0f);
+		lightColor.y = sin(glfwGetTime() * 0.7f);
+		lightColor.z = sin(glfwGetTime() * 1.3f);
+
+		glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f);
+		glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f);
+
+		lightingShader.setVec3("light.ambient", ambientColor);
+		lightingShader.setVec3("light.diffuse", diffuseColor);
 
 		glBindVertexArray(VAO1);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -213,11 +224,11 @@ public:
 
 		float vertices[] = {
 			-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-			 0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
-			 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
-			 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
-			-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
-			-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
+			 0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+			 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+			 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+			-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+			-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
 
 			-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
 			 0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
@@ -273,11 +284,11 @@ public:
 
 		glBindVertexArray(VAO1);
 
-		
+
 		glBindBuffer(GL_ARRAY_BUFFER, VBO1);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-		
+
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
@@ -338,8 +349,16 @@ public:
 		stbi_image_free(data);
 
 		lightingShader.use();
-		lightingShader.setVec3("objectColor", { 1.0f, 0.5f, 0.31f });
-		lightingShader.setVec3("lightColor", { 1.0f, 1.0f, 1.0f });
+
+		lightingShader.setVec3("material.ambient", { 1.0f, 0.5f, 0.31f });
+		lightingShader.setVec3("material.diffuse", { 1.0f, 0.5f, 0.31f });
+		lightingShader.setVec3("material.specular", { 0.5f, 0.5f, 0.5f });
+		lightingShader.setFloat("material.shininess", 32.0f);
+
+
+		lightingShader.setVec3("light.ambient", { 0.2f, 0.2f, 0.2f });
+		lightingShader.setVec3("light.diffuse", { 0.5f, 0.5f, 0.5f }); // darken diffuse light a bit
+		lightingShader.setVec3("light.specular", { 1.0f, 1.0f, 1.0f });
 
 		glUseProgram(0);
 	}
