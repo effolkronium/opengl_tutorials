@@ -61,7 +61,6 @@ function(make_includable input_file output_path include_file)
                              "#include \"${output_path}${input_file_name}\"\n;\n")    
 endfunction(make_includable)
 
-
 file(REMOVE Shaders.h)
 file(REMOVE_RECURSE ShadersGen)
 
