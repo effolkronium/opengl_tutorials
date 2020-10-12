@@ -192,6 +192,10 @@ public:
 		lightingShader.setVec3("light.position", lightPos);
 		lightingShader.setVec3("viewPos", camera.Position);
 
+		lightingShader.setVec3("light.position", camera.Position);
+		lightingShader.setVec3("light.direction", camera.Front);
+		lightingShader.setFloat("light.cutOff", glm::cos(glm::radians(12.5f)));
+
 		// light properties
 		lightingShader.setVec3("light.ambient", { 0.2f, 0.2f, 0.2f });
 		lightingShader.setVec3("light.diffuse", { 0.5f, 0.5f, 0.5f });
@@ -226,7 +230,17 @@ public:
 
 		// render the cube
 		glBindVertexArray(VAO1);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+
+		for (unsigned int i = 0; i < 10; i++)
+		{
+			glm::mat4 model = glm::mat4(1.0f);
+			model = glm::translate(model, cubePositions[i]);
+			float angle = 20.0f * i;
+			model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+			lightingShader.setMat4("model", model);
+
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+		}
 
 
 		// also draw the lamp object
@@ -354,14 +368,25 @@ public:
 		emissionMap = loadTexture("resources/matrix.jpg");
 		lightingShader.setInt("material.emission", 2);
 
+
+		lightingShader.setVec3("light.direction", { -0.2f, -1.0f, -0.3f });
+
+		lightingShader.setFloat("light.constant", 1.0f);
+		lightingShader.setFloat("light.linear", 0.09f);
+		lightingShader.setFloat("light.quadratic", 0.032f);
+
 		glUseProgram(0);
 	}
 private:
 	Window m_window;
 
 //	Shader triangleShader{ s_vertex1, s_fragment1 };
-	Shader lightingShader{ s_vertex1, s_lightingFragment };
+	Shader lightDirectional{ s_vertex1, s_lightDirectional };
+	Shader lightPoint{ s_vertex1, s_lightPoint };
 	Shader lightShader{ s_vertex1, s_fragmentLight };
+	Shader lightFlash{ s_vertex1, s_lightFlash };
+
+	Shader& lightingShader = lightFlash;
 
 	GLuint VBO1 = 0, VAO1 = 0, EBO = 0, texture = 0 , texture2 = 0;
 	GLuint VBO2 = 0, VAO2 = 0;
