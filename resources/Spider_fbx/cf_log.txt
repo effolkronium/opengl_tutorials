@@ -1,0 +1,5 @@
+Warning: None triangle mesh: Spider_Eyes (file: 'C:\Users\effol\Downloads\64-fbx\fbx\Spider_2.fbx') []
+Warning: None triangle mesh: Spider (file: 'C:\Users\effol\Downloads\64-fbx\fbx\Spider_2.fbx') []
+Warning: None triangle mesh: Spider_teeth (file: 'C:\Users\effol\Downloads\64-fbx\fbx\Spider_2.fbx') []
+Warning: None triangle mesh: Spider_Fur (file: 'C:\Users\effol\Downloads\64-fbx\fbx\Spider_2.fbx') []
+Warning: Infinite light range reduced to 1000 []

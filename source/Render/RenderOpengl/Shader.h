@@ -23,4 +23,6 @@ private:
     void reportError(GLuint Id, std::string message);
 private:
     unsigned int m_programID = 0;
+public:
+    unsigned int& Program = m_programID;
 };
