@@ -19,6 +19,12 @@ add_library(${PROJECT_NAME} STATIC
 
             Shaders.h
 
+            Mesh.h
+            Mesh.cpp
+
+            Model.h
+            Model.cpp
+
             ../IRender.h
 
             ${SHADERS}
@@ -33,7 +39,7 @@ target_link_libraries(${PROJECT_NAME}
                 OpenGL::GL
                 glfw
                 glm
-
+                assimp::assimp
                 Utils
 )
 

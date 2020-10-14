@@ -16,6 +16,12 @@ inline constexpr char* const s_lightFlash =
 inline constexpr char* const s_lightPoint = 
 #include "ShadersGen/lightPoint.frag"
 ;
+inline constexpr char* const s_model_loading = 
+#include "ShadersGen/model_loading.vert"
+;
+inline constexpr char* const s_model_loading_v = 
+#include "ShadersGen/model_loading_v.frag"
+;
 inline constexpr char* const s_vertex1 = 
 #include "ShadersGen/vertex1.vert"
 ;
